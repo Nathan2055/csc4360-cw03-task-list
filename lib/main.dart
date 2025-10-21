@@ -5,16 +5,16 @@ import 'database_helper.dart';
 // get_it in a production app.
 final dbHelper = DatabaseHelper();
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // initialize the database
-  //await dbHelper.init();
-  dbHelper.init().then((value) {});
+  await dbHelper.init();
   runApp(MaterialApp(home: DatabaseApp()));
 }
 
 class DatabaseApp extends StatefulWidget {
   const DatabaseApp({super.key});
+
   @override
   _DatabaseAppState createState() => _DatabaseAppState();
 }
@@ -42,89 +42,11 @@ class _DatabaseAppState extends State<DatabaseApp> {
     super.dispose();
   }
 
-  String _truncate(int cutoff, String value) {
-    if (value.length <= cutoff) return value;
-    return '${value.substring(0, cutoff)}...';
-  }
-
-  /*
-  ListView buildCardsForReal() {
-    final cards = buildCards();
-    return cards;
-  }
-
-  Future<ListView> buildCards() async {
-    return ListView.builder(
-      itemCount: await _rowCount(),
-      itemBuilder: await (context, index) {
-        final String name = _getName(index) as String;
-        return Card(
-          child: ListTile(
-            leading: const Icon(Icons.restaurant),
-            title: Text(_truncate(20, name)),
-            //subtitle: Text(_truncate(25, task.ingredients)),
-          ),
-        );
-      },
-    );
-  }
-  */
-
-  /*
-  ListView buildCards() {
-    int count = 0;
-    final count_future = _rowCount().then((value) {
-      count = value;
-    });
-    return ListView.builder(
-      itemCount: count,
-      itemBuilder: (context, index) {
-        String name = '';
-        final name_future = _rowCount().then((value) {
-          count = value;
-        });
-
-        final String name = _getName(index) as String;
-        return Card(
-          child: ListTile(
-            leading: const Icon(Icons.restaurant),
-            title: Text(_truncate(20, name)),
-            //subtitle: Text(_truncate(25, task.ingredients)),
-          ),
-        );
-      },
-    );
-  }
-  */
-
-  ListView buildCards() {
-    int count = 0;
-    _rowCount().then((value) {
-      count = value;
-    });
-    return ListView.builder(
-      itemCount: count,
-      itemBuilder: (context, index) {
-        String name = '';
-        _getName(index).then((value) {
-          name = value;
-        });
-        return Card(
-          child: ListTile(
-            leading: const Icon(Icons.restaurant),
-            title: Text(_truncate(20, name)),
-            //subtitle: Text(_truncate(25, task.ingredients)),
-          ),
-        );
-      },
-    );
-  }
-
   void _insert() async {
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.columnName: 'Bob',
-      DatabaseHelper.columnCompleted: 23,
+      DatabaseHelper.columnAge: 23,
     };
     final id = await dbHelper.insert(row);
     debugPrint('inserted row id: $id');
@@ -143,18 +65,10 @@ class _DatabaseAppState extends State<DatabaseApp> {
     Map<String, dynamic> row = {
       DatabaseHelper.columnId: 1,
       DatabaseHelper.columnName: 'Mary',
-      DatabaseHelper.columnCompleted: 32,
+      DatabaseHelper.columnAge: 32,
     };
     final rowsAffected = await dbHelper.update(row);
     debugPrint('updated $rowsAffected row(s)');
-  }
-
-  Future<int> _rowCount() async {
-    return await dbHelper.queryRowCount();
-  }
-
-  Future<String> _getName(int id) async {
-    return await dbHelper.queryName(id);
   }
 
   void _delete() async {
@@ -320,8 +234,6 @@ class _DatabaseAppState extends State<DatabaseApp> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Column(children: [buildCards()]),
               ],
             ),
           ),

@@ -6,11 +6,11 @@ class DatabaseHelper {
   static const _databaseName = "MyDatabase.db";
   static const _databaseVersion = 1;
 
-  static const table = 'tasks';
+  static const table = 'my_table';
 
   static const columnId = '_id';
   static const columnName = 'name';
-  static const columnCompleted = 'completed';
+  static const columnAge = 'age';
 
   late Database _db;
 
@@ -31,7 +31,7 @@ class DatabaseHelper {
 	          CREATE TABLE $table (
 	            $columnId INTEGER PRIMARY KEY,
 	            $columnName TEXT NOT NULL,
-	            $columnCompleted INTEGER NOT NULL
+	            $columnAge INTEGER NOT NULL
 	          )
 	          ''');
   }
@@ -64,14 +64,6 @@ class DatabaseHelper {
   Future<int> queryRowCount() async {
     final results = await _db.rawQuery('SELECT COUNT(*) FROM $table');
     return Sqflite.firstIntValue(results) ?? 0;
-  }
-
-  Future<String> queryName(int id) async {
-    final results = await _db.rawQuery(
-      'SELECT $columnName FROM $table WHERE $columnId=$id',
-    );
-    return results.toString();
-    //return Sqflite.firstIntValue(results) ?? 0;
   }
 
   // We are assuming here that the id column in the map is set. The other
