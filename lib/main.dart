@@ -13,8 +13,6 @@ Future<void> main() async {
 }
 
 class DatabaseApp extends StatefulWidget {
-  const DatabaseApp({super.key});
-
   @override
   _DatabaseAppState createState() => _DatabaseAppState();
 }
