@@ -2,20 +2,7 @@ import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Database Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const DatabaseExample(),
-    );
-  }
+  runApp(const DatabaseExample());
 }
 
 class DatabaseExample extends StatefulWidget {
@@ -26,6 +13,10 @@ class DatabaseExample extends StatefulWidget {
 }
 
 class _DatabaseExampleState extends State<DatabaseExample> {
+  // Theme control variables
+  ThemeMode _themeMode = ThemeMode.light;
+  bool darkMode = false;
+
   final dbHelper = DBHelper.instance;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descController = TextEditingController();
@@ -62,63 +53,89 @@ class _DatabaseExampleState extends State<DatabaseExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Database CRUD Example')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(hintText: 'Item Name'),
-            ),
-            TextField(
-              controller: descController,
-              decoration: const InputDecoration(hintText: 'Description'),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _addItem,
-                    child: const Text('Add Item'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _refreshItems,
-                    child: const Text('Refresh List'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Items List:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return ListTile(
-                    title: Text(item.name),
-                    subtitle: Text(item.description),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        await dbHelper.deleteItem(item.id!);
-                        _refreshItems();
-                      },
-                    ),
-                  );
-                },
-              ),
+    return MaterialApp(
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: _themeMode,
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text('sqflite'),
+          actions: <Widget>[
+            IconButton(
+              // if dark mode, show sun; if light mode, show moon
+              icon: darkMode
+                  ? const Icon(Icons.sunny)
+                  : const Icon(Icons.mode_night),
+              // same idea for the tooltip text
+              tooltip: darkMode ? 'Light Mode' : 'Dark Mode',
+              onPressed: () {
+                setState(() {
+                  // if on, switch to light mode; if off, switch to dark mode
+                  _themeMode = darkMode ? ThemeMode.light : ThemeMode.dark;
+                  darkMode = !darkMode;
+                });
+              },
             ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(hintText: 'Item Name'),
+              ),
+              TextField(
+                controller: descController,
+                decoration: const InputDecoration(hintText: 'Description'),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _addItem,
+                      child: const Text('Add Item'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _refreshItems,
+                      child: const Text('Refresh List'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Items List:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return ListTile(
+                      title: Text(item.name),
+                      subtitle: Text(item.description),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await dbHelper.deleteItem(item.id!);
+                          _refreshItems();
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
