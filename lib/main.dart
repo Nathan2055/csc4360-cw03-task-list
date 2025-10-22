@@ -19,15 +19,11 @@ class _DatabaseExampleState extends State<DatabaseExample> {
 
   final dbHelper = DBHelper.instance;
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController descController = TextEditingController();
 
   List<Item> items = [];
 
   void _addItem() async {
-    final newItem = Item(
-      name: nameController.text,
-      description: descController.text,
-    );
+    final newItem = Item(name: nameController.text);
     await dbHelper.insertItem(newItem);
     _refreshItems();
     _clearTextFields();
@@ -42,7 +38,6 @@ class _DatabaseExampleState extends State<DatabaseExample> {
 
   void _clearTextFields() {
     nameController.clear();
-    descController.clear();
   }
 
   @override
@@ -88,10 +83,6 @@ class _DatabaseExampleState extends State<DatabaseExample> {
                 controller: nameController,
                 decoration: const InputDecoration(hintText: 'Item Name'),
               ),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(hintText: 'Description'),
-              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -122,7 +113,6 @@ class _DatabaseExampleState extends State<DatabaseExample> {
                     final item = items[index];
                     return ListTile(
                       title: Text(item.name),
-                      subtitle: Text(item.description),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
