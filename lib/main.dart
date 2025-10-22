@@ -2,28 +2,27 @@ import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
 void main() {
-  runApp(const DatabaseExample());
+  runApp(const TaskList());
 }
 
-class DatabaseExample extends StatefulWidget {
-  const DatabaseExample({super.key});
-
+class TaskList extends StatefulWidget {
+  const TaskList({super.key});
   @override
-  State<DatabaseExample> createState() => _DatabaseExampleState();
+  State<TaskList> createState() => _TaskListState();
 }
 
-class _DatabaseExampleState extends State<DatabaseExample> {
+class _TaskListState extends State<TaskList> {
   // Theme control variables
   ThemeMode _themeMode = ThemeMode.light;
   bool darkMode = false;
 
+  // Database and text editor control variables
   final dbHelper = DBHelper.instance;
   final TextEditingController nameController = TextEditingController();
-
   List<Item> items = [];
 
   void _addItem() async {
-    final newItem = Item(name: nameController.text);
+    final newItem = Item(name: nameController.text, completed: 0);
     await dbHelper.insertItem(newItem);
     _refreshItems();
     _clearTextFields();
@@ -56,7 +55,7 @@ class _DatabaseExampleState extends State<DatabaseExample> {
       home: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('sqflite'),
+          title: const Text('Task List'),
           actions: <Widget>[
             IconButton(
               // if dark mode, show sun; if light mode, show moon
@@ -111,14 +110,39 @@ class _DatabaseExampleState extends State<DatabaseExample> {
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final item = items[index];
+                    Text name = Text(item.name);
+                    if (item.completed == 1) {
+                      name = Text(
+                        item.name,
+                        style: const TextStyle(
+                          color: Colors.blueGrey,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      );
+                    }
                     return ListTile(
-                      title: Text(item.name),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await dbHelper.deleteItem(item.id!);
-                          _refreshItems();
-                        },
+                      title: name,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.check_box,
+                              color: Colors.green,
+                            ),
+                            onPressed: () async {
+                              await dbHelper.markComplete(item);
+                              _refreshItems();
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              await dbHelper.deleteItem(item.id!);
+                              _refreshItems();
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },
